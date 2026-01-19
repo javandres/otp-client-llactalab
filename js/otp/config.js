@@ -54,7 +54,7 @@ otp.config = {
    * The OTP web service locations
    */
   // hostname: "http://201.159.223.152",
-  hostname: "http://appsllactalab.ucuenca.edu.ec/otp_v1/",
+  hostname: "https://appsllactalab.ucuenca.edu.ec/otp_v1/",
   //municoderHostname : "http://localhost:8080",
   //datastoreUrl : 'http://localhost:9000',
   // In the 0.10.x API the base path is "otp-rest-servlet/ws"
