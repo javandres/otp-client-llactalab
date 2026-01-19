@@ -335,6 +335,9 @@ otp.widgets.tripoptions.TimeSelector =
         });
 
         $('#'+this.id+'-date').datepicker({
+            // Ensure the string we store in module.date matches otp.config.locale.time.date_format
+            // so moment(this.date, otp.config.locale.time.date_format) parses correctly later.
+            dateFormat: otp.util.Time.getDatepickerDateFormat(),
             timeFormat: otp.config.locale.time.time_format_picker,
             onSelect: function(date) {
                 this_.tripWidget.inputChanged({
@@ -393,7 +396,10 @@ otp.widgets.tripoptions.TimeSelector =
         //var m = moment(data.queryParams.date+" "+data.queryParams.time, "MM-DD-YYYY h:mma");
         //$('#'+this.id+'-picker').datepicker("setDate", new Date(m));
         if(data.queryParams.date) {
-            $('#'+this.id+'-date').datepicker("setDate", new Date(moment(data.queryParams.date, otp.config.locale.time.date_format)));
+            var mDate = moment(data.queryParams.date, otp.config.locale.time.date_format, true);
+            if(mDate.isValid()) {
+                $('#'+this.id+'-date').datepicker("setDate", mDate.toDate());
+            }
             this.tripWidget.module.date = data.queryParams.date;
         }
         if(data.queryParams.time) {

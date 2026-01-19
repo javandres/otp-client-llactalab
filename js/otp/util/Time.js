@@ -20,6 +20,69 @@ otp.namespace("otp.util");
 
 otp.util.Time = {
 
+    /**
+     * Convert a Moment.js date format string to a jQuery UI Datepicker dateFormat string.
+     * Supports numeric formats used by this client (D/DD, M/MM, YY/YYYY and separators).
+     *
+     * Examples:
+     *  - "DD/MM/YYYY" -> "dd/mm/yy"
+     *  - "MM/DD/YYYY" -> "mm/dd/yy"
+     */
+    momentDateFormatToDatepicker : function(momentFormat) {
+        if(!momentFormat || typeof momentFormat !== 'string') return "mm/dd/yy";
+
+        // Replace longer tokens first to avoid partial replacements.
+        return momentFormat
+            .replace(/YYYY/g, "yy")
+            .replace(/YY/g, "y")
+            .replace(/DD/g, "dd")
+            .replace(/D/g, "d")
+            .replace(/MM/g, "mm")
+            .replace(/M/g, "m");
+    },
+
+    getDatepickerDateFormat : function() {
+        return this.momentDateFormatToDatepicker(otp.config.locale.time.date_format);
+    },
+
+    /**
+     * Parse a user-entered date string into a Moment. Primary format comes from
+     * otp.config.locale.time.date_format, with common fallbacks to be resilient
+     * to manual typing (e.g. 01/18/2024 in an es locale).
+     */
+    parseUserDate : function(dateStr) {
+        if(dateStr == null) return moment.invalid();
+        if(typeof dateStr !== 'string') dateStr = "" + dateStr;
+        dateStr = dateStr.trim();
+        if(dateStr.length === 0) return moment.invalid();
+
+        var primary = otp.config.locale.time.date_format;
+        var formats = [
+            primary,
+            "DD/MM/YYYY", "D/M/YYYY",
+            "MM/DD/YYYY", "M/D/YYYY",
+            "DD-MM-YYYY", "D-M-YYYY",
+            "MM-DD-YYYY", "M-D-YYYY",
+            "YYYY-MM-DD"
+        ];
+
+        // de-duplicate while preserving order (avoid dependency on _.uniq here)
+        var seen = {};
+        var uniqueFormats = [];
+        for(var i=0; i<formats.length; i++) {
+            var f = formats[i];
+            if(!f || seen[f]) continue;
+            seen[f] = true;
+            uniqueFormats.push(f);
+        }
+
+        var m = moment(dateStr, uniqueFormats, true);
+        if(m.isValid()) return m;
+
+        // Non-strict fallback (handles some oddities / localized parsing)
+        return moment(dateStr);
+    },
+
     secsToHrMin : function(secs) {
         //TODO: momentjs.duration could be used
         var hrs = Math.floor(secs / 3600);

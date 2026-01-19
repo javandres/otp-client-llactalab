@@ -172,9 +172,10 @@ otp.widgets.ItinerariesWidget =
             var itin = this_.itineraries[this_.activeIndex];
             var params = itin.tripPlan.queryParams;
             var stopId = itin.getFirstStopID();
+            var mDate = otp.util.Time.parseUserDate(this_.module.date);
             _.extend(params, {
                 startTransitStopId :  stopId,
-                date: moment(this_.module.date, otp.config.locale.time.date_format).format("MM-DD-YYYY"),
+                date: (mDate.isValid() ? mDate.format("MM-DD-YYYY") : moment().format("MM-DD-YYYY")),
                 time : serviceBreakTime,
                 arriveBy : false,
                 originalQueryTime: itin.tripPlan.queryParams.originalQueryTime || otp.util.Time.constructQueryTime(itin.tripPlan.queryParams)
@@ -222,9 +223,10 @@ otp.widgets.ItinerariesWidget =
             var itin = this_.itineraries[this_.activeIndex];
             var params = itin.tripPlan.queryParams;
             var stopId = itin.getFirstStopID();
+            var mDate = otp.util.Time.parseUserDate(this_.module.date);
             _.extend(params, {
                 startTransitStopId :  stopId,
-                date : moment(this_.module.date, otp.config.locale.time.date_format).add('days', 1).format("MM-DD-YYYY"),
+                date : (mDate.isValid() ? mDate.add('days', 1).format("MM-DD-YYYY") : moment().add('days', 1).format("MM-DD-YYYY")),
                 time : serviceBreakTime,
                 arriveBy : true,
                 originalQueryTime: itin.tripPlan.queryParams.originalQueryTime || otp.util.Time.constructQueryTime(itin.tripPlan.queryParams)
